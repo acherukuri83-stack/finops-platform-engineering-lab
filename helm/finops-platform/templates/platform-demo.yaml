@@ -1,0 +1,44 @@
+{{- if .Values.platformDemo.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-demo
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.platformDemo.replicaCount }}
+  selector:
+    matchLabels:
+      app: platform-demo
+  template:
+    metadata:
+      labels:
+        app: platform-demo
+    spec:
+      containers:
+        - name: platform-demo
+          image: "{{ .Values.platformDemo.image.repository }}:{{ .Values.platformDemo.image.tag }}"
+          ports:
+            - containerPort: 80
+          resources:
+{{ toYaml .Values.platformDemo.resources | indent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-demo
+  namespace: {{ .Values.global.namespace }}
+spec:
+  selector:
+    app: platform-demo
+  ports:
+    - port: {{ .Values.platformDemo.service.port }}
+      targetPort: 80
+{{- end }}
