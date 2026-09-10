@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: finops-platform
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/acherukuri83-stack/finops-platform-engineering-lab.git
+    targetRevision: main
+    path: helm/finops-platform
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: finops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
