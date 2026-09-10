@@ -1,0 +1,25 @@
+name: Platform CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-platform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm lint
+        run: helm lint helm/finops-platform
+
+      - name: Render Helm templates
+        run: helm template finops helm/finops-platform --namespace finops > /tmp/rendered.yaml
+
+      - name: Show rendered resources
+        run: cat /tmp/rendered.yaml
